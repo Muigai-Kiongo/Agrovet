@@ -39,7 +39,7 @@ Ensure you have the following installed on your machine:
 1.  **Clone the Repository**
     ```bash
     git clone [https://github.com/Muigai-Kiongo/Agrovet.git](https://github.com/Muigai-Kiongo/Agrovet.git)
-    cd agrovet-system
+    cd Agrovet
     ```
 
 2.  **Environment Configuration**
