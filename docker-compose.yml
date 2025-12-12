@@ -1,0 +1,62 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --api.dashboard=true
+      - --log.level=INFO
+    ports:
+      - "8080:80"     # Traefik HTTP available on host:8080
+      - "127.0.0.1:8081:8080"   # Traefik dashboard RESTRICTED to localhost
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+    restart: unless-stopped
+    networks:
+      - webproxy
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.docker.network=agrovet_webproxy"
+
+  web:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=agrovet_webproxy"
+      - "traefik.http.routers.agrovet.rule=Host(`agrovet.local`)"
+      - "traefik.http.routers.agrovet.entrypoints=web"
+      - "traefik.http.services.agrovet.loadbalancer.server.port=8000"
+    restart: unless-stopped
+    networks:
+      - webproxy
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agrovet}
+      POSTGRES_USER: ${POSTGRES_USER:-agrovet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agrovet}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - webproxy
+
+volumes:
+  pgdata:
+
+networks:
+  webproxy:
+    name: agrovet_webproxy
+    driver: bridge

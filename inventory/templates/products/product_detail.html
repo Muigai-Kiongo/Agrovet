@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - Agrovet{% endblock %}
+{% block content %}
+<h2>{{ product.name }} ({{ product.sku }})</h2>
+<p>{{ product.description }}</p>
+
+<dl class="row">
+  <dt class="col-sm-3">Category</dt><dd class="col-sm-9">{{ product.category }}</dd>
+  <dt class="col-sm-3">Unit</dt><dd class="col-sm-9">{{ product.unit }}</dd>
+  <dt class="col-sm-3">Buying price</dt><dd class="col-sm-9">{{ product.buying_price }}</dd>
+  <dt class="col-sm-3">Selling price</dt><dd class="col-sm-9">{{ product.selling_price }}</dd>
+  <dt class="col-sm-3">Stock</dt><dd class="col-sm-9">{{ product.stock_quantity }}</dd>
+</dl>
+
+<a class="btn btn-secondary" href="{% url 'inventory:product_edit' product.pk %}">Edit</a>
+<a class="btn btn-outline-primary" href="{% url 'inventory:product_list' %}">Back to list</a>
+{% endblock %}

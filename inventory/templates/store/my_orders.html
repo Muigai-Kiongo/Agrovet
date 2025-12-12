@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}My Orders - Agrovet{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-history text-primary me-2"></i>Order History</h2>
+            <p class="text-muted mb-0">Track and view your past purchases.</p>
+        </div>
+        <a href="{% url 'inventory:store_home' %}" class="btn btn-primary">
+            <i class="fas fa-shopping-bag me-2"></i> Shop Again
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3">Order ID</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">#{{ order.id }}</td>
+                            <td class="text-muted">{{ order.date|date:"M d, Y" }}</td>
+                            <td class="fw-bold">${{ order.total }}</td>
+                            <td>
+                                {% if order.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark border border-warning">Pending Approval</span>
+                                {% elif order.status == 'COMPLETED' %}
+                                    <span class="badge bg-success bg-opacity-25 text-success border border-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted d-block text-truncate" style="max-width: 250px;">
+                                    {% for item in order.items.all|slice:":2" %}
+                                        {{ item.quantity|floatformat:0 }}x {{ item.product.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if order.items.count > 2 %}...{% endif %}
+                                </small>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-light text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#order-details-{{ order.id }}">
+                                    View Details <i class="fas fa-chevron-down ms-1"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="collapse bg-light" id="order-details-{{ order.id }}">
+                            <td colspan="6" class="p-4">
+                                <h6 class="fw-bold mb-3">Order Items</h6>
+                                <ul class="list-group list-group-flush shadow-sm rounded">
+                                    {% for item in order.items.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center bg-white">
+                                        <div>
+                                            <span class="fw-bold text-dark">{{ item.product.name }}</span>
+                                            <br>
+                                            <small class="text-muted">Unit Price: ${{ item.unit_price }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-light text-dark border me-2">Qty: {{ item.quantity }}</span>
+                                            <span class="fw-bold text-success">${{ item.line_total }}</span>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="mb-3 text-muted opacity-25">
+                                    <i class="fas fa-shopping-basket fa-4x"></i>
+                                </div>
+                                <h5 class="text-muted">No orders found</h5>
+                                <p class="text-muted small">You haven't placed any orders yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

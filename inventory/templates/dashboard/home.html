@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2 text-dark"><i class="fas fa-tachometer-alt text-success me-2"></i>Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'inventory:admin_report' %}" class="btn btn-sm btn-outline-dark">
+                <i class="fas fa-file-alt"></i> Generate Report
+            </a>
+            
+            <a href="{% url 'inventory:sale_add' %}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-cash-register"></i> New POS Sale
+            </a>
+            <a href="{% url 'inventory:product_add' %}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 bg-success text-white">
+            <div class="card-body">
+                <h6 class="text-uppercase mb-2 opacity-75">Today's Sales</h6>
+                <h2 class="display-6 fw-bold">${{ todays_sales|floatformat:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 bg-warning text-dark">
+            <div class="card-body">
+                <h6 class="text-uppercase mb-2 opacity-75">Pending Orders</h6>
+                <h2 class="display-6 fw-bold">{{ pending_orders }}</h2>
+                <a href="{% url 'inventory:order_list' %}" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+            <div class="card-body">
+                <h6 class="text-uppercase mb-2 opacity-75">Total Products</h6>
+                <h2 class="display-6 fw-bold">{{ products_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 bg-danger text-white">
+            <div class="card-body">
+                <h6 class="text-uppercase mb-2 opacity-75">Low Stock</h6>
+                <h2 class="display-6 fw-bold">{{ low_stock_products|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white"><h5 class="mb-0">Configuration</h5></div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'inventory:category_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-tags text-secondary me-2"></i> Manage Categories</div>
+                        <span class="badge bg-light text-dark">{{ categories_count }}</span>
+                    </a>
+                    <a href="{% url 'inventory:unit_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-balance-scale text-secondary me-2"></i> Manage Units</div>
+                        <i class="fas fa-chevron-right text-muted small"></i>
+                    </a>
+                    <a href="{% url 'inventory:stock_history' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div><i class="fas fa-history text-secondary me-2"></i> Stock History Logs</div>
+                        <i class="fas fa-chevron-right text-muted small"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white"><h5 class="mb-0">People</h5></div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'inventory:supplier_list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-truck text-secondary me-2"></i> Manage Suppliers
+                    </a>
+                    <a href="{% url 'inventory:customer_list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users text-secondary me-2"></i> Manage Customers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

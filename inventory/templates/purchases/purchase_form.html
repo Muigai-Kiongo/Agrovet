@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}New Purchase - Agrovet{% endblock %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2 class="border-bottom pb-2"><i class="fas fa-truck-loading text-primary me-2"></i>Record Purchase</h2>
+    </div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  
+  <div class="card mb-4 shadow-sm border-0">
+    <div class="card-body bg-light rounded">
+        <div class="row align-items-center">
+            <div class="col-md-2">
+                <label for="supplier" class="form-label fw-bold mb-0">Select Supplier:</label>
+            </div>
+            <div class="col-md-10">
+                <select id="supplier" name="supplier" class="form-select" required>
+                    <option value="" selected>Choose supplier...</option>
+                    {% for s in suppliers %}
+                        <option value="{{ s.pk }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+      <div class="card-header bg-white py-3">
+          <h5 class="mb-0">Incoming Items</h5>
+      </div>
+      <div class="card-body p-0">
+          <div class="table-responsive">
+            {{ formset.management_form }}
+            <table class="table table-bordered mb-0" id="items-table">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 45%">Product</th>
+                        <th style="width: 20%">Quantity</th>
+                        <th style="width: 20%">Cost Price</th>
+                        <th style="width: 15%" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="form-set-body">
+                  {% for form in formset %}
+                    <tr class="item-row">
+                      <td class="p-2">{{ form.product }}</td>
+                      <td class="p-2">{{ form.quantity }}</td>
+                      <td class="p-2">{{ form.unit_price }}</td>
+                      <td class="text-center align-middle">
+                        {% if form.instance.pk %}
+                            {{ form.DELETE }}
+                        {% else %}
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-row border-0">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        {% endif %}
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+            </table>
+          </div>
+      </div>
+      <div class="card-footer bg-white p-3">
+          <button type="button" id="add-item" class="btn btn-primary text-white">
+              <i class="fas fa-plus"></i> Add Item
+          </button>
+      </div>
+  </div>
+  
+  <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+      <a class="btn btn-light border btn-lg" href="{% url 'inventory:dashboard' %}">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+          Save Purchase
+      </button>
+  </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... (Same Script as Sale Form, just reusing standard logic) ...
+        const addItemBtn = document.getElementById('add-item');
+        const totalFormsInput = document.getElementById('id_items-TOTAL_FORMS');
+        const tableBody = document.getElementById('form-set-body');
+        
+        $('.item-row select').select2({width: '100%', theme: 'bootstrap-5'});
+
+        addItemBtn.addEventListener('click', function() {
+            let formIdx = parseInt(totalFormsInput.value);
+            const firstRow = tableBody.querySelector('.item-row');
+            if(!firstRow) return;
+            const newRow = firstRow.cloneNode(true);
+            newRow.innerHTML = newRow.innerHTML.replace(/-0-/g, `-${formIdx}-`);
+            
+            const inputs = newRow.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.value = '';
+                if(input.tagName === 'SELECT') {
+                    const container = newRow.querySelector('.select2-container');
+                    if(container) container.remove();
+                    input.classList.remove('select2-hidden-accessible');
+                    input.removeAttribute('data-select2-id');
+                    const match = input.name.match(/items-(\d+)-/);
+                    if(match) {
+                        input.name = input.name.replace(`items-${match[1]}-`, `items-${formIdx}-`);
+                        input.id = input.id.replace(`items-${match[1]}-`, `items-${formIdx}-`);
+                    }
+                }
+            });
+            tableBody.appendChild(newRow);
+            totalFormsInput.value = formIdx + 1;
+            $(newRow).find('select').select2({width: '100%', theme: 'bootstrap-5'});
+        });
+        
+        tableBody.addEventListener('click', function(e) {
+            const btn = e.target.closest('.remove-row');
+            if (btn) btn.closest('tr').remove();
+        });
+    });
+</script>
+{% endblock %}

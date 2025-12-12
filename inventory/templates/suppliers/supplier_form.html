@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Supplier Form{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Supplier</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Company Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        {{ form.address }}
+                    </div>
+                    <button type="submit" class="btn btn-secondary w-100">Save Supplier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

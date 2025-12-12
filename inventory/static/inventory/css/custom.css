@@ -1,0 +1,84 @@
+/* Agrovet Theme Variables */
+:root {
+    --agro-primary: #198754;       /* Bootstrap Success Green (matches bg-success) */
+    --agro-primary-dark: #146c43;  
+    --agro-accent: #ffc107;        /* Warning Yellow */
+    --agro-bg: #f8f9fa;
+    --text-dark: #212529;
+}
+
+body {
+    background-color: var(--agro-bg);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar Tweaks (Enhances bg-success) */
+.navbar-custom {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* Ensure Nav Links are visible */
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255,0.9);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--agro-accent);
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    background-color: white;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 700;
+    color: var(--agro-primary-dark);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--agro-primary);
+    border-color: var(--agro-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--agro-primary-dark);
+    border-color: var(--agro-primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--agro-primary);
+    border-color: var(--agro-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--agro-primary);
+    border-color: var(--agro-primary);
+}
+
+/* Product Card Specifics */
+.product-card .card-img-top {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}

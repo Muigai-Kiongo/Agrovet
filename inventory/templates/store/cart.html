@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Your Cart</h2>
+
+    {% if items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center text-white" style="width: 50px; height: 50px;">
+                                                    <i class="fas fa-box"></i>
+                                                </div>
+                                            {% endif %}
+                                            <a href="{% url 'inventory:store_product_detail' item.product.pk %}" class="text-decoration-none text-dark fw-bold">
+                                                {{ item.product.name }}
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.product.selling_price }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-end pe-4 fw-bold">${{ item.line_total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'inventory:store_home' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
+                <a href="{% url 'inventory:clear_cart' %}" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash"></i> Clear Cart
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Subtotal</span>
+                        <span class="fw-bold">${{ total }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 text-muted">
+                        <span>Tax</span>
+                        <span>$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5">Total</span>
+                        <span class="h5 text-primary">${{ total }}</span>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'inventory:checkout' %}" class="btn btn-primary btn-lg">
+                            Proceed to Checkout <i class="fas fa-chevron-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-shopping-basket fa-4x text-muted"></i>
+        </div>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted">Looks like you haven't added anything yet.</p>
+        <a href="{% url 'inventory:store_home' %}" class="btn btn-primary mt-3">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

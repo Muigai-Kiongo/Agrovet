@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Unit Form{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-info">
+                    <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit{% else %}Add{% endif %} Unit
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Unit Name</label>
+                        {{ form.name }}
+                        <div class="form-text">Full name (e.g., Kilogram, Litre).</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Abbreviation</label>
+                        {{ form.abbreviation }}
+                        <div class="form-text">Short code (e.g., kg, L, pcs).</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-info text-white">Save Unit</button>
+                        <a href="{% url 'inventory:unit_list' %}" class="btn btn-light border">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

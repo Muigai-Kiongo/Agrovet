@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Category Form{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-success">
+                    <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit{% else %}Add{% endif %} Category
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Category Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Parent Category (Optional)</label>
+                        {{ form.parent }}
+                        <div class="form-text">Select a parent if this is a sub-category.</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">Save Category</button>
+                        <a href="{% url 'inventory:category_list' %}" class="btn btn-light border">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
