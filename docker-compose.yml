@@ -1,0 +1,76 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --api.dashboard=true
+      - --log.level=INFO
+    environment:
+      # This fixes the "client version too old" error by matching your host API
+      - DOCKER_API_VERSION=1.24
+    ports:
+      - "8080:80"
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+    restart: unless-stopped
+    networks:
+      - webproxy
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.docker.network=agrovet_webproxy"
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=agrovet_webproxy"
+      - "traefik.http.routers.agrovet.rule=Host(`agrovet.local`)"
+      - "traefik.http.routers.agrovet.entrypoints=web"
+      - "traefik.http.services.agrovet.loadbalancer.server.port=8000"
+    restart: unless-stopped
+    networks:
+      - webproxy
+    # Fix for "Network is unreachable" and "Name resolution failure"
+    extra_hosts:
+      - "smtp.gmail.com:74.125.133.108"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agrovet}
+      POSTGRES_USER: ${POSTGRES_USER:-agrovet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agrovet}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - webproxy
+
+volumes:
+  pgdata:
+
+networks:
+  webproxy:
+    name: agrovet_webproxy
+    driver: bridge
+    driver_opts:
+      # Bypasses MTU fragmentation issues common on Linux laptops/Wi-Fi
+      com.docker.network.driver.mtu: 1400

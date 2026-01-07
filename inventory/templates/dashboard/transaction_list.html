@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Stock History - Agrovet{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-history text-secondary me-2"></i>Stock History Log</h1>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Time</th>
+                        <th>Product</th>
+                        <th>Transaction Type</th>
+                        <th>Quantity</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="ps-4 text-muted small">{{ t.timestamp|date:"M d, Y H:i" }}</td>
+                        <td class="fw-bold">{{ t.product.name }}</td>
+                        <td>
+                            {% if t.transaction_type == 'IN' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                                    <i class="fas fa-arrow-down"></i> IN (Restock)
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">
+                                    <i class="fas fa-arrow-up"></i> OUT (Sold)
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ t.quantity|floatformat:0 }}</td>
+                        <td class="text-muted small">
+                            <i class="fas fa-hashtag me-1"></i> {{ t.reference }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No transaction history available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center pt-3">
+        <nav>
+            <ul class="pagination pagination-sm">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">{{ page_obj.number }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

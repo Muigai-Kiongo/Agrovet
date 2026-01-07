@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Product - Agrovet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 text-success">
+                    <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Product Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">SKU (Code)</label>
+                            {{ form.sku }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Unit</label>
+                            {{ form.unit }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Buying Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.buying_price }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Selling Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.selling_price }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Reorder Level</label>
+                            {{ form.reorder_level }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Description</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Product Image</label>
+                            {{ form.image }}
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                {{ form.active }}
+                                <label class="form-check-label" for="{{ form.active.id_for_label }}">Active (Visible in Store)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-light border">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

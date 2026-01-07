@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart | Agrovet{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-success-subtle p-3 rounded-circle me-3">
+            <i class="fas fa-shopping-cart text-success fa-lg"></i>
+        </div>
+        <h2 class="fw-bold mb-0">Your Shopping Cart</h2>
+    </div>
+
+    {% if items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr class="text-uppercase small fw-bold text-muted">
+                                    <th class="ps-4 py-3">Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="" class="rounded me-3 border" style="width: 60px; height: 60px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center text-muted border" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-seedling"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <a href="{% url 'inventory:store_product_detail' item.product.pk %}" class="text-decoration-none text-dark fw-bold mb-0 d-block">
+                                                    {{ item.product.name }}
+                                                </a>
+                                                <small class="text-muted">{{ item.product.category.name|default:"General" }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-secondary">KES {{ item.product.selling_price|floatformat:2 }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-white text-dark border px-3 py-2 fs-6 fw-normal">{{ item.quantity }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4 fw-bold text-success">KES {{ item.line_total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'inventory:store_home' %}" class="btn btn-link text-success text-decoration-none fw-bold p-0">
+                    <i class="fas fa-arrow-left me-1"></i> Continue Shopping
+                </a>
+                <a href="{% url 'inventory:clear_cart' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                    <i class="fas fa-trash-alt me-1"></i> Clear My Cart
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Item Subtotal</span>
+                        <span class="fw-bold">KES {{ total|floatformat:2 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Processing Fee</span>
+                        <span class="text-success small fw-bold">FREE</span>
+                    </div>
+                    <hr class="my-3 opacity-10">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5 fw-bold">Grand Total</span>
+                        <span class="h5 fw-bold text-success">KES {{ total|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="alert alert-warning border-0 small mb-4">
+                        <i class="fas fa-shield-alt me-2"></i> Stock is reserved only after successful M-Pesa payment.
+                    </div>
+
+                    <div class="d-grid">
+                        <a href="{% url 'inventory:checkout' %}" class="btn btn-success btn-lg rounded-pill py-3 shadow-sm fw-bold">
+                            Proceed to Checkout <i class="fas fa-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="small text-muted mb-2">Secure Payment Options</p>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" alt="M-Pesa" style="height: 25px;" class="opacity-75">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="bg-light d-inline-block p-4 rounded-circle mb-4">
+            <i class="fas fa-shopping-basket fa-4x text-muted opacity-50"></i>
+        </div>
+        <h3 class="fw-bold">Your cart is feeling light</h3>
+        <p class="text-muted">You haven't added any seeds, fertilizers, or tools to your cart yet.</p>
+        <a href="{% url 'inventory:store_home' %}" class="btn btn-success btn-lg rounded-pill px-5 mt-3 shadow-sm">
+            Start Shopping Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

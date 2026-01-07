@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %} {% block title %}System Report - Agrovet{% endblock %}
+
+{% block content %}
+<style>
+    /* Print Styling */
+    @media print {
+        .navbar-custom, .footer, .btn, .no-print, .breadcrumb, .alert, .filter-section {
+            display: none !important;
+        }
+        body {
+            background-color: white !important;
+            padding-top: 0 !important;
+            color: black !important;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .report-header {
+            display: block !important;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+    }
+
+    /* UI Enhancements */
+    .filter-card {
+        background-color: #f1f3f5;
+        border-radius: 12px;
+    }
+    .active-filter {
+        background-color: #198754 !important;
+        color: white !important;
+        border-color: #198754 !important;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-file-invoice-dollar text-success me-2"></i> System Report</h2>
+            <p class="text-muted">Generated on {{ report_date|date:"F j, Y H:i" }}</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+            <button onclick="window.print()" class="btn btn-primary shadow-sm">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 no-print filter-section">
+        <div class="card-body filter-card">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                    <label class="form-label small fw-bold text-uppercase text-muted">Select Period</label>
+                    <div class="btn-group w-100 shadow-sm">
+                        <a href="?period=today" class="btn btn-white border {% if current_period == 'today' %}active-filter{% endif %}">Today</a>
+                        <a href="?period=weekly" class="btn btn-white border {% if current_period == 'weekly' %}active-filter{% endif %}">Weekly</a>
+                        <a href="?period=monthly" class="btn btn-white border {% if current_period == 'monthly' %}active-filter{% endif %}">Monthly</a>
+                        <a href="?period=yearly" class="btn btn-white border {% if current_period == 'yearly' %}active-filter{% endif %}">Yearly</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <form method="GET" action=".">
+                        <input type="hidden" name="period" value="custom">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Custom Range</label>
+                        <div class="input-group shadow-sm">
+                            <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}" required>
+                            <span class="input-group-text bg-white">to</span>
+                            <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}" required>
+                            <button type="submit" class="btn btn-success">Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-header d-none d-print-block mb-4">
+        <div class="row">
+            <div class="col-6">
+                <h1 class="text-success fw-bold">AGROVET STORE</h1>
+                <p class="mb-0 text-muted">Performance & Inventory Status Report</p>
+                <p class="small text-uppercase fw-bold">Period: {{ current_period|capfirst }}</p>
+            </div>
+            <div class="col-6 text-end">
+                <p class="mb-0"><strong>Generated On:</strong> {{ report_date|date:"d M Y H:i" }}</p>
+                <p class="mb-0"><strong>Admin User:</strong> {{ user.username }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold py-3">Financial Analysis ({{ current_period|capfirst }})</div>
+                <div class="card-body">
+                    <div class="mb-3 text-center py-2">
+                        <h2 class="display-6 fw-bold text-success">KES {{ period_revenue|intcomma }}</h2>
+                        <span class="text-muted small text-uppercase fw-bold">Selected Period Revenue</span>
+                    </div>
+                    <hr class="opacity-10">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span>Today's Total:</span>
+                        <span class="fw-bold text-dark">KES {{ today_revenue|intcomma }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0 small">
+                        <span>Lifetime Total:</span>
+                        <span class="fw-bold text-dark">KES {{ total_revenue|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold py-3">Database Statistics</div>
+                <div class="card-body d-flex align-items-center">
+                    <div class="row text-center w-100">
+                        <div class="col-4">
+                            <h3 class="fw-bold mb-0 text-primary">{{ total_products|intcomma }}</h3>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Products</small>
+                        </div>
+                        <div class="col-4 border-start border-end">
+                            <h3 class="fw-bold mb-0 text-primary">{{ total_customers|intcomma }}</h3>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Customers</small>
+                        </div>
+                        <div class="col-4">
+                            <h3 class="fw-bold mb-0 text-primary">{{ total_suppliers|intcomma }}</h3>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Suppliers</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-danger text-white fw-bold py-3 d-print-none">
+            <i class="fas fa-exclamation-triangle me-2"></i> Inventory Action Items
+        </div>
+        <div class="card-header bg-light fw-bold text-dark d-none d-print-block border-bottom">
+            Critical Inventory Alerts
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase">
+                            <th class="ps-4">Product Name</th>
+                            <th>SKU</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Current Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in critical_stock %}
+                        <tr>
+                            <td class="ps-4 fw-bold">{{ p.name }}</td>
+                            <td><code class="text-muted">{{ p.sku }}</code></td>
+                            <td><span class="badge bg-danger rounded-pill">Out of Stock</span></td>
+                            <td class="text-end pe-4 text-danger fw-bold">{{ p.stock_quantity|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                        
+                        {% for p in reorder_stock %}
+                        <tr>
+                            <td class="ps-4">{{ p.name }}</td>
+                            <td><code class="text-muted">{{ p.sku }}</code></td>
+                            <td><span class="badge bg-warning text-dark rounded-pill">Reorder Soon</span></td>
+                            <td class="text-end pe-4 fw-bold">{{ p.stock_quantity|intcomma }} / {{ p.reorder_level|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        {% if not critical_stock and not reorder_stock %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-success">
+                                <i class="fas fa-check-circle fa-2x mb-2 d-block"></i>
+                                All stock levels are currently within safe parameters.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-dark text-white fw-bold py-3">
+            Last 10 Transactions ({{ current_period|capfirst }})
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase">
+                            <th class="ps-4">Order ID</th>
+                            <th>Date & Time</th>
+                            <th>Customer</th>
+                            <th>Channel</th>
+                            <th class="text-end pe-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td class="ps-4 fw-bold">#{{ sale.id }}</td>
+                            <td class="text-muted small">{{ sale.date|date:"Y-m-d H:i" }}</td>
+                            <td>{{ sale.customer.name|default:"Walk-in Customer" }}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {% if sale.channel == 'WEB' %}<i class="fas fa-globe me-1 text-primary"></i>Online{% else %}<i class="fas fa-store me-1 text-success"></i>POS{% endif %}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4 fw-bold text-success">KES {{ sale.total|intcomma }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-5 text-muted small">No transactions found for this selection.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5 mb-4">
+        <p class="text-muted small">End of Status Report. This document is a confidential summary of Agrovet business performance.</p>
+        <p class="text-muted small d-none d-print-block">Printed on: {% now "Y-m-d H:i" %}</p>
+    </div>
+</div>
+{% endblock %}
